@@ -6,7 +6,7 @@ use std::process::exit;
 use std::thread;
 use std::time::{Duration, SystemTime};
 
-use chrono::{Locale, NaiveDate, NaiveTime, Local, Timelike};
+use chrono::{Local, Locale, NaiveDate, NaiveTime, Timelike};
 use clap::Parser;
 use reqwest::blocking::Client;
 use serde_json::{json, Value};
@@ -202,7 +202,10 @@ fn main() {
         }
         let date = NaiveDate::parse_from_str(day["date"].as_str().unwrap(), "%Y-%m-%d").unwrap();
         let locale = Locale::try_from(lang.locale_str().as_str()).unwrap_or(Locale::en_US);
-        tooltip += &format!("{}</b>\n", date.format_localized(args.date_format.as_str(), locale));
+        tooltip += &format!(
+            "{}</b>\n",
+            date.format_localized(args.date_format.as_str(), locale)
+        );
 
         let (max_temp, min_temp) = if args.fahrenheit {
             (
@@ -278,6 +281,7 @@ fn main() {
         }
     }
     data.insert("tooltip", tooltip);
+    data.insert("alt", tooltip);
 
     let css_class = current_condition[lang.weather_desc()][0]["value"]
         .as_str()
